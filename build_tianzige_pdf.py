@@ -13,8 +13,9 @@ PDF_PATH = OUT_DIR / "tianzige_full_workbook_vector.pdf"
 
 FIRST_PAGE_CHARS = ["一", "二", "三", "十", "人", "大", "小", "口"]
 ROWS_PER_PAGE = 16
-COLS = 12
-KOUZIGE_COLS = {4, 5, 6, 10, 11, 12}
+COLS = 13
+KOUZIGE_COLS = {8, 9, 10, 11, 12, 13}
+NO_GRID_COLS = {1}
 
 FONT_NAME = "KaitiSCEmbedded"
 FONT_PATH = None
@@ -95,12 +96,13 @@ def draw_centered_char(c, char, x, y, size, color):
     c.drawString(draw_x, draw_y, char)
 
 
-def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), show_guides=True):
-    c.setLineWidth(0.45)
-    c.setStrokeColorRGB(0.25, 0.25, 0.25)
-    c.rect(x, y, size, size, stroke=1, fill=0)
+def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), grid_style="tian"):
+    if grid_style != "none":
+        c.setLineWidth(0.45)
+        c.setStrokeColorRGB(0.25, 0.25, 0.25)
+        c.rect(x, y, size, size, stroke=1, fill=0)
 
-    if show_guides:
+    if grid_style == "tian":
         c.setLineWidth(0.25)
         c.setStrokeColorRGB(0.78, 0.78, 0.78)
         c.line(x + size / 2, y, x + size / 2, y + size)
@@ -111,11 +113,23 @@ def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), show_guides=True)
 
 
 def draw_row(c, char, x, y, size, gap):
-    entries = [char] + [char] * 5 + [None] * 6
-    colors = [(0.02, 0.02, 0.02)] + [(0.74, 0.74, 0.74)] * 5 + [(0.02, 0.02, 0.02)] * 6
+    entries = [char] + [char] * 3 + [None] * 3 + [char] * 3 + [None] * 3
+    colors = (
+        [(0.02, 0.02, 0.02)]
+        + [(0.74, 0.74, 0.74)] * 3
+        + [(0.02, 0.02, 0.02)] * 3
+        + [(0.74, 0.74, 0.74)] * 3
+        + [(0.02, 0.02, 0.02)] * 3
+    )
     for col, value in enumerate(entries):
-        show_guides = (col + 1) not in KOUZIGE_COLS
-        draw_cell(c, x + col * (size + gap), y, size, value, colors[col], show_guides)
+        col_num = col + 1
+        if col_num in NO_GRID_COLS:
+            grid_style = "none"
+        elif col_num in KOUZIGE_COLS:
+            grid_style = "kou"
+        else:
+            grid_style = "tian"
+        draw_cell(c, x + col * (size + gap), y, size, value, colors[col], grid_style)
 
 
 def draw_page_background(c, page_w, page_h):
@@ -129,17 +143,16 @@ def make_pdf():
     chars = workbook_chars()
 
     page_w, page_h = A4
-    margin_x = 28
-    top_margin = 28
-    bottom_margin = 28
     col_gap = 0
     row_gap = 5.2
     cell_size = min(40.5, (page_w - margin_x * 2 - col_gap * (COLS - 1)) / COLS)
+    content_w = COLS * cell_size + (COLS - 1) * col_gap
     row_pitch = cell_size + row_gap
     content_h = ROWS_PER_PAGE * cell_size + (ROWS_PER_PAGE - 1) * row_gap
-    start_y = page_h - top_margin - cell_size
-    if content_h > page_h - top_margin - bottom_margin:
+    if content_w > page_w or content_h > page_h:
         raise ValueError("Grid layout does not fit on A4")
+    start_x = (page_w - content_w) / 2
+    start_y = (page_h + content_h) / 2 - cell_size
 
     pdf = canvas.Canvas(str(PDF_PATH), pagesize=A4, pageCompression=1)
     pdf.setTitle("田字格汉字描写练习")
@@ -152,7 +165,7 @@ def make_pdf():
             pdf.showPage()
             draw_page_background(pdf, page_w, page_h)
         y = start_y - row_in_page * row_pitch
-        draw_row(pdf, char, margin_x, y, cell_size, col_gap)
+        draw_row(pdf, char, start_x, y, cell_size, col_gap)
 
     pdf.save()
     return PDF_PATH, len(chars)

@@ -132,9 +132,9 @@ def make_pdf():
     margin_x = 28
     top_margin = 28
     bottom_margin = 28
-    col_gap = 3.2
+    col_gap = 0
     row_gap = 5.2
-    cell_size = (page_w - margin_x * 2 - col_gap * (COLS - 1)) / COLS
+    cell_size = min(40.5, (page_w - margin_x * 2 - col_gap * (COLS - 1)) / COLS)
     row_pitch = cell_size + row_gap
     content_h = ROWS_PER_PAGE * cell_size + (ROWS_PER_PAGE - 1) * row_gap
     start_y = page_h - top_margin - cell_size

@@ -145,7 +145,7 @@ def make_pdf():
     page_w, page_h = A4
     col_gap = 0
     row_gap = 5.2
-    cell_size = min(40.5, (page_w - margin_x * 2 - col_gap * (COLS - 1)) / COLS)
+    cell_size = 40.5
     content_w = COLS * cell_size + (COLS - 1) * col_gap
     row_pitch = cell_size + row_gap
     content_h = ROWS_PER_PAGE * cell_size + (ROWS_PER_PAGE - 1) * row_gap

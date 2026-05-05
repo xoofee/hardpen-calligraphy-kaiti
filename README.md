@@ -15,6 +15,10 @@
 
 这份 PDF 使用常用规范汉字生成练习页。每一行包含示范字、浅色描红字、田字格练习格，以及口字格练习格，适合按字逐行练习硬笔楷体结构。
 
+练习册的汉字顺序来自 `generated/common_chars_level_1.txt`。这个文件由 `build_tianzige_workbook.py` 首次运行时从“通用规范汉字一级字表”页面抓取并缓存，后续生成会直接复用该缓存，以保持练习顺序稳定。
+
+脚本会把 `一`、`二`、`三`、`十`、`人`、`大`、`小`、`口` 放在最前面，方便从基础笔画和简单结构开始练习；后面的汉字按 `common_chars_level_1.txt` 中的顺序排列。
+
 ### 空白田字格 / 口字格练习纸
 
 文件：`generated/blank_tianzige_kouzige_exercise.pdf`

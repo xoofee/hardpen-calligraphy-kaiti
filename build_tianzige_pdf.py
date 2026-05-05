@@ -80,11 +80,11 @@ def workbook_chars():
     return ordered
 
 
-def draw_centered_char(c, char, x, y, size, color):
+def draw_centered_char(c, char, x, y, size, color, global_bbox_side):
     bbox = glyph_bbox(char)
     bbox_w = bbox[2] - bbox[0]
     bbox_h = bbox[3] - bbox[1]
-    font_size = (size * 0.80) * 1000 / max(bbox_w, bbox_h)
+    font_size = (size * 0.80) * 1000 / global_bbox_side
     c.setFillColorRGB(*color)
     c.setFont(FONT_NAME, font_size)
     center_x = x + size / 2
@@ -96,7 +96,7 @@ def draw_centered_char(c, char, x, y, size, color):
     c.drawString(draw_x, draw_y, char)
 
 
-def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), grid_style="tian"):
+def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), grid_style="tian", global_bbox_side=1000):
     if grid_style != "none":
         c.setLineWidth(0.45)
         c.setStrokeColorRGB(0.25, 0.25, 0.25)
@@ -109,10 +109,10 @@ def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), grid_style="tian"
         c.line(x, y + size / 2, x + size, y + size / 2)
 
     if char:
-        draw_centered_char(c, char, x, y, size, color)
+        draw_centered_char(c, char, x, y, size, color, global_bbox_side)
 
 
-def draw_row(c, char, x, y, size, gap):
+def draw_row(c, char, x, y, size, gap, global_bbox_side):
     entries = [char] + [char] * 3 + [None] * 3 + [char] * 3 + [None] * 3
     colors = (
         [(0.02, 0.02, 0.02)]
@@ -129,7 +129,16 @@ def draw_row(c, char, x, y, size, gap):
             grid_style = "kou"
         else:
             grid_style = "tian"
-        draw_cell(c, x + col * (size + gap), y, size, value, colors[col], grid_style)
+        draw_cell(
+            c,
+            x + col * (size + gap),
+            y,
+            size,
+            value,
+            colors[col],
+            grid_style,
+            global_bbox_side,
+        )
 
 
 def draw_page_background(c, page_w, page_h):
@@ -141,6 +150,10 @@ def make_pdf():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     register_font()
     chars = workbook_chars()
+    global_bbox_side = max(
+        max(glyph_bbox(char)[2] - glyph_bbox(char)[0], glyph_bbox(char)[3] - glyph_bbox(char)[1])
+        for char in chars
+    )
 
     page_w, page_h = A4
     col_gap = 0
@@ -165,7 +178,7 @@ def make_pdf():
             pdf.showPage()
             draw_page_background(pdf, page_w, page_h)
         y = start_y - row_in_page * row_pitch
-        draw_row(pdf, char, start_x, y, cell_size, col_gap)
+        draw_row(pdf, char, start_x, y, cell_size, col_gap, global_bbox_side)
 
     pdf.save()
     return PDF_PATH, len(chars)

@@ -5,6 +5,7 @@
 ## 已生成 PDF
 
 - [田字格汉字描写练习册](generated/tianzige_full_workbook_vector.pdf)
+- [横画专项田字格描写练习册](generated/horizontal_stroke_training.pdf)
 - [空白田字格 / 口字格练习纸](generated/blank_tianzige_kouzige_exercise.pdf)
 
 ## 内容说明
@@ -19,6 +20,12 @@
 
 脚本会把 `一`、`二`、`三`、`十`、`人`、`大`、`小`、`口` 放在最前面，方便从基础笔画和简单结构开始练习；后面的汉字按 `common_chars_level_1.txt` 中的顺序排列。
 
+### 横画专项田字格描写练习册
+
+文件：`generated/horizontal_stroke_training.pdf`
+
+这份 PDF 用于专项练习横画，从 `一`、`二`、`三` 开始，逐步过渡到 `目`、`量` 等横画较多的汉字。页面结构与主练习册一致，包含示范字、浅色描红字、田字格练习格和口字格练习格。
+
 ### 空白田字格 / 口字格练习纸
 
 文件：`generated/blank_tianzige_kouzige_exercise.pdf`
@@ -31,6 +38,7 @@
 
 ```bash
 python3 build_tianzige_pdf.py
+python3 build_horizontal_stroke_pdf.py
 python3 build_blank_grid_pdf.py
 ```
 

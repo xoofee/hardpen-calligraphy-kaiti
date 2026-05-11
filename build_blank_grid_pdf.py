@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent
 OUT_DIR = ROOT / "generated"
 PDF_PATH = OUT_DIR / "blank_tianzige_kouzige_exercise.pdf"
 
-ROWS = 16
+ROWS = 18
 COLS = 12
 TIAN_COLS = set(range(1, 7))
 
@@ -18,10 +18,14 @@ def draw_page_background(c, page_w, page_h):
     c.rect(0, 0, page_w, page_h, stroke=0, fill=1)
 
 
-def draw_cell(c, x, y, size, grid_style):
+def draw_cell(c, x, y, size, grid_style, draw_top=True):
     c.setLineWidth(0.45)
     c.setStrokeColorRGB(0.25, 0.25, 0.25)
-    c.rect(x, y, size, size, stroke=1, fill=0)
+    c.line(x, y, x + size, y)
+    c.line(x, y, x, y + size)
+    c.line(x + size, y, x + size, y + size)
+    if draw_top:
+        c.line(x, y + size, x + size, y + size)
 
     if grid_style == "tian":
         c.setLineWidth(0.25)
@@ -35,7 +39,7 @@ def make_pdf():
 
     page_w, page_h = A4
     col_gap = 0
-    row_gap = 5.2
+    row_gap = 0
     cell_size = 40.5
     content_w = COLS * cell_size + (COLS - 1) * col_gap
     content_h = ROWS * cell_size + (ROWS - 1) * row_gap
@@ -55,7 +59,7 @@ def make_pdf():
         for col in range(COLS):
             x = start_x + col * (cell_size + col_gap)
             grid_style = "tian" if (col + 1) in TIAN_COLS else "kou"
-            draw_cell(pdf, x, y, cell_size, grid_style)
+            draw_cell(pdf, x, y, cell_size, grid_style, draw_top=row == 0)
 
     pdf.save()
     return PDF_PATH

@@ -12,7 +12,7 @@ CHAR_CACHE = OUT_DIR / "common_chars_level_1.txt"
 PDF_PATH = OUT_DIR / "tianzige_full_workbook_vector.pdf"
 
 FIRST_PAGE_CHARS = ["一", "二", "三", "十", "人", "大", "小", "口"]
-ROWS_PER_PAGE = 16
+ROWS_PER_PAGE = 18
 COLS = 13
 KOUZIGE_COLS = {8, 9, 10, 11, 12, 13}
 NO_GRID_COLS = {1}
@@ -96,11 +96,25 @@ def draw_centered_char(c, char, x, y, size, color, global_bbox_side):
     c.drawString(draw_x, draw_y, char)
 
 
-def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), grid_style="tian", global_bbox_side=1000):
+def draw_cell(
+    c,
+    x,
+    y,
+    size,
+    char=None,
+    color=(0.1, 0.1, 0.1),
+    grid_style="tian",
+    global_bbox_side=1000,
+    draw_top=True,
+):
     if grid_style != "none":
         c.setLineWidth(0.45)
         c.setStrokeColorRGB(0.25, 0.25, 0.25)
-        c.rect(x, y, size, size, stroke=1, fill=0)
+        c.line(x, y, x + size, y)
+        c.line(x, y, x, y + size)
+        c.line(x + size, y, x + size, y + size)
+        if draw_top:
+            c.line(x, y + size, x + size, y + size)
 
     if grid_style == "tian":
         c.setLineWidth(0.25)
@@ -112,7 +126,7 @@ def draw_cell(c, x, y, size, char=None, color=(0.1, 0.1, 0.1), grid_style="tian"
         draw_centered_char(c, char, x, y, size, color, global_bbox_side)
 
 
-def draw_row(c, char, x, y, size, gap, global_bbox_side):
+def draw_row(c, char, x, y, size, gap, global_bbox_side, row_in_page):
     entries = [char] + [char] * 3 + [None] * 3 + [char] * 3 + [None] * 3
     colors = (
         [(0.02, 0.02, 0.02)]
@@ -138,6 +152,7 @@ def draw_row(c, char, x, y, size, gap, global_bbox_side):
             colors[col],
             grid_style,
             global_bbox_side,
+            draw_top=row_in_page == 0,
         )
 
 
@@ -157,7 +172,7 @@ def make_pdf():
 
     page_w, page_h = A4
     col_gap = 0
-    row_gap = 5.2
+    row_gap = 0
     cell_size = 40.5
     content_w = COLS * cell_size + (COLS - 1) * col_gap
     row_pitch = cell_size + row_gap
@@ -178,7 +193,7 @@ def make_pdf():
             pdf.showPage()
             draw_page_background(pdf, page_w, page_h)
         y = start_y - row_in_page * row_pitch
-        draw_row(pdf, char, start_x, y, cell_size, col_gap, global_bbox_side)
+        draw_row(pdf, char, start_x, y, cell_size, col_gap, global_bbox_side, row_in_page)
 
     pdf.save()
     return PDF_PATH, len(chars)

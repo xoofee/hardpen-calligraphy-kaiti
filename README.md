@@ -8,6 +8,7 @@
 - [横画专项田字格描写练习册](generated/horizontal_stroke_training.pdf)
 - [空白田字格 / 口字格练习纸](generated/blank_tianzige_kouzige_exercise.pdf)
 
+
 ## 内容说明
 
 ### 田字格汉字描写练习册
@@ -32,6 +33,12 @@
 
 这份 PDF 是空白练习纸，左侧为田字格，右侧为口字格，适合自由临写、默写或课堂练习。
 
+### 《龟虽寿》A4 诗词海报
+
+文件：`generated/gui_sui_shou_poster.pdf`
+
+这份 PDF 是横版 A4 诗词海报，使用楷体竖排《龟虽寿》全文，并省去标点，适合打印后张贴。
+
 ## 重新生成
 
 项目中的脚本会把输出文件写入 `generated/` 目录。
@@ -40,6 +47,7 @@
 python3 build_tianzige_pdf.py
 python3 build_horizontal_stroke_pdf.py
 python3 build_blank_grid_pdf.py
+python3 build_gui_sui_shou_poster.py
 ```
 
 如果需要生成 Word 版本练习册，可以运行：
